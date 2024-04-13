@@ -12,3 +12,8 @@ class GanoConCocaCola(models.Model):
     class Meta:
         verbose_name = 'Gano con Coca Cola Lead'
         verbose_name_plural = 'Gano con Coca Cola Leads'
+        
+        
+models_relation = {
+    "ganoconcocacola": GanoConCocaCola
+}
