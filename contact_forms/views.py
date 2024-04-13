@@ -15,7 +15,7 @@ API_KEY = os.getenv("API_KEY")
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ContactForm (View):
+class ContactForm(View):
     
     def post(self, request):
         """ Send email and redirect """
@@ -43,6 +43,14 @@ class ContactForm (View):
                 "data": {}
             }, status=400)
         
+        # Validate api user name
+        if not form_data["api_key"] == API_KEY:
+            return JsonResponse({
+                "status": "error",
+                "message": "invalid login",
+                "data": {}
+            }, status=401)
+        
         # Get and validate model fields
         model_fields = models.GanoConCocaCola._meta.get_fields()
         model_fields_names = [field.name for field in model_fields]
@@ -57,16 +65,14 @@ class ContactForm (View):
                     "message": f"missing '{field_name}' field",
                     "data": {}
                 }, status=400)
-
-        # Validate api user name
-        if not form_data["api_key"] == API_KEY:
-            return JsonResponse({
-                "status": "error",
-                "message": "invalid login",
-                "data": {}
-            }, status=401)
             
-        # Change email credentials
+        # Save form data
+        for key in ["api_key", "form", "redirect"]:
+            if key in form_data.keys():
+                del form_data[key]
+        model(**form_data).save()
+            
+        # Connect to email server
         connection = mail.get_connection(
             host=settings.EMAIL_HOST,
             port=settings.EMAIL_PORT,
