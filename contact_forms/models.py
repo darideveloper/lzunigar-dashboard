@@ -2,6 +2,7 @@ from django.db import models
 
 
 class GanoConCocaCola(models.Model):
+    id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     email = models.EmailField()
     mensaje = models.TextField()

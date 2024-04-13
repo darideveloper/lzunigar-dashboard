@@ -54,9 +54,15 @@ class ContactForm(View):
         # Get and validate model fields
         model_fields = models.GanoConCocaCola._meta.get_fields()
         model_fields_names = [field.name for field in model_fields]
-        remove_fields = ["id", "created_at", "updated_at"]
         model_fields_names = list(filter(
-            lambda field: field not in remove_fields, model_fields_names
+            lambda field: field not in [
+                "id",
+                "created_at",
+                "updated_at",
+                "redirect",
+                "api_key"
+            ],
+            model_fields_names
         ))
         for field_name in model_fields_names:
             if field_name not in form_data.keys() or not form_data[field_name]:
@@ -67,10 +73,10 @@ class ContactForm(View):
                 }, status=400)
             
         # Save form data
-        for key in ["api_key", "form", "redirect"]:
-            if key in form_data.keys():
-                del form_data[key]
-        model(**form_data).save()
+        fields_data = {}
+        for model_field_name in model_fields_names:
+            fields_data[model_field_name] = form_data[model_field_name]
+        model(**fields_data).save()
             
         # Connect to email server
         connection = mail.get_connection(
