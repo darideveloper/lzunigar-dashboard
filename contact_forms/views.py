@@ -89,9 +89,13 @@ class ContactForm(View):
         connection.open()
         
         # Create email
+        fields_data_text = ""
+        for field_name, field_value in fields_data.items():
+            fields_data_text += f"{field_name}: {field_value}\n"
         model_admin_url = f"{settings.HOST}/admin/contact_forms/{form_name}/"
         subject = "Nuevo lead en tu dashboard"
-        message = f"Accede a {model_admin_url} para ver el nuevo lead"
+        message = f"Accede a {model_admin_url} para ver " \
+            f"el nuevo lead\n{fields_data_text}"
         email = EmailMessage(
             subject=subject,
             body=message,
